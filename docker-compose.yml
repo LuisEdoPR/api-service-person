@@ -1,0 +1,28 @@
+version: "3.4"
+
+services:
+
+  mongo-db:
+    image: mongo:6.0.6
+    container_name: mongo-db
+    environment:
+      - MONGO_INITDB_DATABASE=admin
+      - MONGO_INITDB_ROOT_USERNAME=admin
+      - MONGO_INITDB_ROOT_PASSWORD=password
+      - TEST_DATABASE=default
+      - TEST_DATABASE_USERNAME=useradmin
+      - TEST_DATABASE_PASSWORD=password
+    ports:
+      - 27017:27017
+    volumes:
+      - mongo-data:/var/tmp/db
+      - ./init-mongo.js:/docker-entrypoint-initdb.d/01-init-mongo.js
+    healthcheck:
+      test: echo 'db.runCommand("ping").ok' | mongosh localhost:27017/test --quiet
+      interval: 10s
+      timeout: 30s
+      retries: 5
+      start_period: 7s
+
+volumes:
+  mongo-data:
